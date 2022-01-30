@@ -1,0 +1,181 @@
+from PyQt5.QtWidgets import *
+from PyQt5.QtGui import *
+from PyQt5.QtCore import *
+# ---------------------------------------------------
+# explain the code:
+# First before Explain pressing [/ + ctrl] after shading
+# will make a code as comment in python.
+
+#In above code we add three library and will we explain fast:
+
+#note:(*)in above code mean all elemnts
+
+#1)QtWidgets::for creating user interfaces
+
+#2)QtGui::Deals with the graphical elements
+
+#3)QtCore::contains the core classes, including the event loop and Qt's signal and slot mechanism
+# ---------------------------------------------------
+
+class MainWindow(QMainWindow):
+    def closeEvent(self, e):
+        if not text.document().isModified():
+            return
+        answer = QMessageBox.question(
+            window, None,
+            "You have unsaved changes. Save before closing?",
+            QMessageBox.Save | QMessageBox.Discard | QMessageBox.Cancel
+        )
+        if answer & QMessageBox.Save:
+            save()
+            if text.document().isModified():
+            	# This happens when the user closes the Save As... dialog.
+            	# We do not want to close the window in this case because it
+            	# would throw away unsaved changes.
+                e.ignore()
+        elif answer & QMessageBox.Cancel:
+            e.ignore()
+# --------------------------------------------------------------
+# explain the code:
+#in above class we make a class called mainwindow and pass a paramater
+#called QMainWindow which is a pyqt main window to show window
+#after that we make a close event function which we use for close
+#command e represent parameter
+#first "if not text.document().isModified():return" this mean if
+#input text not save(not modified) return or no exit and show window message
+#represent by "answer = QMessageBox.question" which QMessageBox is to creat
+#window message and question mean type of window and after that we pass window
+#inside it to connect and None is to ensure it empty and type the message
+#"You have unsaved changes. Save before closing?" after that we make the message
+#buttom which it is "save,discard,cancel" after that we make condition
+#"if answer & QMessageBox.Save:save()" this mean we we press save it is
+#use function(save()) to save text and this function we we creat later
+#"if text.document().isModified()::e.ignore()" this mean if text is already
+# modified(save) refuse command and exit message window after that
+# "elif answer & QMessageBox.Cancel:e.ignore()" mean when press on cancel close message
+#window
+
+# --------------------------------------------------------------
+app = QApplication([])
+app.setApplicationName("Text Editor")
+app.setWindowIcon(QIcon("text editor.svg"))
+text = QPlainTextEdit()
+text.setStyleSheet("QPlainTextEdit{font-size:22pt}")
+window = MainWindow()
+window.setGeometry(700,700,700,700)
+window.setCentralWidget(text)
+
+file_path = None
+
+menu = window.menuBar().addMenu("&File")
+#---------------------------------------------------------------------------------
+#explain the above code:
+
+#we creat a application (not window) called app and set the name for this app
+# "app.setApplicationName("Text Editor")" and add icon for it
+# "app.setWindowIcon(QIcon("icon.svg"))" after that we make space area for writting
+#text "text= QPlainTextEdit()" and change the style you need css learn before u
+#understand this after that we creat our window and connect to class and make geometry
+#and make it's space with text varible which main only for writting
+#and make file_path varible which we need next after that made a menu call file which
+# it a drob down menu
+
+#---------------------------------------------------------------------------------
+
+def open_file():
+    global file_path
+    path = QFileDialog.getOpenFileName(window, "Open")[0]
+    if path:
+        text.setPlainText(open(path).read())
+        file_path = path
+open_action = QAction("&Open")
+open_action.triggered.connect(open_file)
+open_action.setShortcut(QKeySequence.Open)
+menu.addAction(open_action)
+#--------------------------------------------------------------------------
+#explain the code:
+#we craet a function called "open_file" funtion and make previous
+# varible "file_path" as "global" which mean we can us inside function and creat "path"
+#which it "QfileDialog" which mean can access the file inside computer
+#"(window,"open")[0]" meanconnect to window and make filter "open" and
+#"[0]" this value for not make error and open file after this condition
+#"if path:" to open file and read it and put it into text area by set "text" with it
+#and make "path" empty by "file_path = path" better for open anew file again
+#make a first item in file menu which is"open_action = QAction("&Open")"
+#"QAction("&Open")" mean creat and name it and it prefer to use "&" with name
+#making shourtcut "Alt+F" in window and linux after the we connect this item to function
+#"open_file" to make it work after we make  ashourtcut which appear beside name of item
+#and to menu
+#--------------------------------------------------------------------------
+
+def save():
+    if file_path is None:
+        save_as()
+    else:
+        with open(file_path, "w") as f:
+            f.write(text.toPlainText())
+        text.document().setModified(False)
+        #UP is for not change in save after save(not saving after save)
+save_action = QAction("&Save")
+save_action.triggered.connect(save)
+save_action.setShortcut(QKeySequence.Save)
+menu.addAction(save_action)
+
+save_as_action = QAction("Save &As...")
+
+#--------------------------------------------------------------
+#explain the above code:
+# the condition mean if directory is empty make "save_as()" which
+#is afunction we explain after by it's mean which do (save as)
+#after that we open"file_path" which is empty and use filter"w" which mean write and represent
+#it by f and write it to text area and use the ("text.document().setModified(False)" to
+#stop save after save and remain is the same as above
+#--------------------------------------------------------------
+
+def save_as():
+    global file_path
+    path = QFileDialog.getSaveFileName(window, "Save As")[0]
+    if path:
+        file_path = path
+        save()
+save_as_action.triggered.connect(save_as)
+menu.addAction(save_as_action)
+
+close = QAction("&Close")
+close.triggered.connect(window.close)
+menu.addAction(close)
+
+help_menu = window.menuBar().addMenu("&Help")
+about_action = QAction("&About")
+help_menu.addAction(about_action)
+#-------------------------------------------------------------------------
+#explain the code:
+
+#we make as above
+#we use" QFileDialog.getSaveFileName"to save file.Condition for use (save())
+#if path is empty to save use two funtion inside two to make save
+#and make as above
+
+
+#-------------------------------------------------------------------------
+
+def show_about_dialog():
+    text = "<center>" \
+           "<h1>Text Editor</h1>" \
+           "</center>" \
+           "<p>Version 31.4.159.265358</br>" \
+           "Copyright &copy; Company Inc.</p>"
+    QMessageBox.about(window, "About Text Editor", text)
+about_action.triggered.connect(show_about_dialog)
+
+window.show()
+app.exec_()
+
+#-------------------------------------------------------------------
+#explain the above code:
+#we do as above explain but here uses message window and uses html inside it and
+# make type "about" and name it ("About Text Editor") and pass window and text
+#for connect and show window by("window.show() app.exec_()") and make it executable
+
+
+#-------------------------------------------------------------------
